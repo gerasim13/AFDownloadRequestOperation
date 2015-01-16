@@ -23,8 +23,8 @@
 #import "AFDownloadRequestOperation.h"
 #import "AFURLConnectionOperation.h"
 #import <CommonCrypto/CommonDigest.h>
-#include <fcntl.h>
-#include <unistd.h>
+#import <fcntl.h>
+#import <unistd.h>
 
 #if !__has_feature(objc_arc)
 #error "Compile this file with ARC"
@@ -199,7 +199,7 @@ typedef void (^AFURLConnectionProgressiveOperationProgressBlock)(AFDownloadReque
     [self updateByteStartRangeForRequest];
 }
 
-- (id)responseObject {
+- (id)responseData {
     @synchronized(self) {
         if (!_responseObject && [self isFinished] && !self.error) {
             NSError *localError = nil;
@@ -281,10 +281,16 @@ typedef void (^AFURLConnectionProgressiveOperationProgressBlock)(AFDownloadReque
     }
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data  {
-    if (![self.responseSerializer validateResponse:self.response data:data ?: [NSData data] error:NULL])
+- (void)connection:(NSURLConnection *)connection
+    didReceiveData:(NSData *)data
+{
+//    if (![self.responseSerializer validateResponse:self.response data:data ?: [NSData data] error:NULL])
+//        return; // don't write to output stream if any error occurs
+    
+    if (!data) {
         return; // don't write to output stream if any error occurs
-
+    }
+    
     [super connection:connection didReceiveData:data];
 
     // track custom bytes read because totalBytesRead persists between pause/resume.
