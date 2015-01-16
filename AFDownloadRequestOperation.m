@@ -201,7 +201,7 @@ typedef void (^AFURLConnectionProgressiveOperationProgressBlock)(AFDownloadReque
 
 - (id)responseData {
     @synchronized(self) {
-        if (!_responseObject && [self isFinished] && !self.error) {
+        if (!_responseObject && [self isFinished] && !_fileError) {
             NSError *localError = nil;
             if ([self isCancelled]) {
                 // should we clean up? most likely we don't.
@@ -213,7 +213,7 @@ typedef void (^AFURLConnectionProgressiveOperationProgressBlock)(AFDownloadReque
                 }
                 
                 // loss of network connections = error set, but not cancel
-            }else if(!self.error) {
+            }else if(!_fileError) {
                 // move file to final position and capture error
                 NSFileManager *fileManager = [NSFileManager new];
                 if (self.shouldOverwrite) {
